@@ -1,28 +1,13 @@
 var  config = require('./dbconfig');
 const  sql = require('mssql');
 
-
-async function getBar(idBar){
-    return {
-        nome:'Pascal',
-        id: idBar,
-        scuola:'ITT Pascal',
-        indirizzo:'via Bella 15',
-        citta: 'Cesena',
-        fascieOrarie:[
-            {
-                ora_inizio: '11:00',
-                ora_fine: '12:00'
-            }
-        ]
-    }
-}
-
-async function getMenu(idBar){
+async function loginUtenti(username, password){
     try {
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
-        .query("SELECT * from Prenotazioni  ");
+        .input('email', sql.NVarChar, username)
+        .input('password', sql.NVarChar, password)
+        .query("SELECT Utenti.ID, Utenti.Nome, Cognome, Classe, Data_Nascita, Scuola.Nome, Email, Indirizzo, Citta FROM Utenti INNER JOIN Scuola ON IDScuola = Scuola.ID WHERE Utenti.Email = @email AND Password = @password");
         return  product.recordsets;
     }
         catch (error) {
@@ -30,9 +15,58 @@ async function getMenu(idBar){
     }
 }
 
-async function getProdotto(idBar, idProdotto){
-    return {
-        nome:'coca-cola'
+async function loginDipendenti(username, password){
+    try {
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('user', sql.NVarChar, username)
+        .input('password', sql.NVarChar, password)
+        .query("SELECT Dipendenti.ID, Username, Ruolo, Bar.Nome, Indirizzo, Citta, Scuola.Nome FROM Dipendenti INNER JOIN Bar ON IDBar = Bar.ID INNER JOIN Scuola ON IDScuola = Scuola.ID WHERE Username = @user AND Password = @password");
+        return  product.recordsets;
+    }
+        catch (error) {
+        console.log(error);
+    }
+}
+
+async function getBar(IDBar){
+    try{
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('IDBar', sql.Int, IDBar)
+        .query("SELECT Bar.ID, Bar.Nome AS NomeBar, Scuola.Nome AS NomeScuola, Indirizzo, Citta FROM Bar INNER JOIN Scuola ON IDScuola = Scuola.ID WHERE Bar.ID = @IDBar");
+        return product.recordset;
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+
+async function getMenu(IDBar){
+    try {
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('IDBar', sql.Int, IDBar)
+        .query("SELECT * FROM Menu INNER JOIN BarMenu ON IDMenu = Menu.ID INNER JOIN Bar ON IDBar = Bar.ID WHERE IDBar = @IDBar");
+        return  product.recordsets;
+    }
+        catch (error) {
+        console.log(error);
+    }
+}
+
+async function getProdotto(IDBar, IDProdotto){
+    //TODO: Aggiungere info su scuola
+    try {
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('IDBar', sql.Int, IDBar)
+        .input('IDProdotto', sql.Int, IDProdotto)
+        .query("SELECT Prodotto.ID, Prodotto.Nome, Descrizione, Categoria, Prezzo FROM Menu INNER JOIN BarMenu ON IDMenu = Menu.ID INNER JOIN Bar ON IDBar = Bar.ID INNER JOIN MenuProdotto ON BarMenu.IDMenu = Menu.ID INNER JOIN Prodotto ON IDProdotto = Prodotto.ID INNER JOIN Categoria ON Categoria.ID = IDCategoria WHERE IDBar = @IDBar AND Prodotto.ID = @IDProdotto");
+        return  product.recordsets;
+    }
+        catch (error) {
+        console.log(error);
     }
 }
 
@@ -69,7 +103,7 @@ async function getPrenotazioni(idUser){
     }
 }
 
-async function postPrenotazione(idUser){
+async function postPrenotazione(idUser, data){
     return {
         ok:true
     }
@@ -94,5 +128,5 @@ async function getPrenotazione(idUser, idPrenotazione){
 }
 
 module.exports = {
-    getBar,getMenu, getProdotto, register, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione
+    getBar,getMenu, getProdotto, register, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, login
 }
