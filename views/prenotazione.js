@@ -9,7 +9,7 @@ function get(req, res, next) {
 
 function getSingle(req, res, next) {  
     getPrenotazione(req.params['idUser'], req.params['idPrenotazione']).then((data)=>{
-        res.json(data[0])
+        res.json(data)
     })
 };
 
@@ -28,7 +28,7 @@ function post(req, res, next){
 function del(req, res, next){
     try{
         deletePrenotazione(req.params['idUser'], req.params['idPrenotazione']).then(data=>{
-            res.json(data[0])
+            res.json(data)
         })
     }catch(ex){
         res.status(500).json({message:'internal error'})

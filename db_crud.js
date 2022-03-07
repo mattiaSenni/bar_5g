@@ -165,10 +165,9 @@ async function getPrenotazione(idPrenotazione){
     try {
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
-        .input('IDUser', sql.Int, idUser)
         .input('IDPrenotazione', sql.Int, idPrenotazione)
-        .query("SELECT Modalita_pagamento, Prenotazione.Data, Stato ,Utenti.Nome, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine FROM Prenotazioni INNER JOIN Utenti ON Utenti.ID = Prenotazione.IDUtente INNER JOIN Transazioni ON Transazioni.ID = IDTransazioni INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOrario.ID INNER JOIN Scuola ON IDScuola = Scuola.ID INNER JOIN Provenienza ON IDProvenienza = Provenienza.ID WHERE IDPrenotazione = Prenotazione.ID");        
-        return  product.recordsets;
+        .query("SELECT Modalita_pagamento, Prenotazioni.Data, Stato ,Utenti.Nome, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine FROM Prenotazioni INNER JOIN Utenti ON Utenti.ID = Prenotazioni.IDUtente INNER JOIN Transazioni ON Transazioni.ID = IDTransazione INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOraria.ID INNER JOIN Scuola ON IDScuola = Scuola.ID INNER JOIN Provenienza ON IDProvenienza = Provenienza.ID WHERE @IDPrenotazione = Prenotazioni.ID");        
+        return  product.recordsets; 
     }
         catch (error) {
         console.log(error);
@@ -190,7 +189,7 @@ async function updateBar(idBar, nome){
 }
 
 async function postProdotto(idBar, nome){
-    try {
+    /*try {
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
         .input('IDBar', sql.Int, idBar)
@@ -200,9 +199,22 @@ async function postProdotto(idBar, nome){
     }
         catch (error) {
         console.log(error);
+    }*/
+}
+
+async function deleteBar(idBar){
+    try {
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('ID', sql.Int, idBar)
+        .query("DELETE FROM Bar WHERE ID = @ID");
+        return  product.recordsets;
+    }
+        catch (error) {
+        console.log(error);
     }
 }
 
 module.exports = {
-    getBar,getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar
+    getBar,getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar, postProdotto, deleteBar
 }
