@@ -2,7 +2,7 @@ const  config = {
     user:  'sa',
     password:  'burbero2020',
     server:  '10.1.0.19', // 'PC0152'
-    database:  'Teatro_5G',
+    database:  'Bar_5G',
     options: {
       trustedconnection:  true,
       trustServerCertificate: true,

@@ -1,12 +1,24 @@
 var express = require('express');
 var router = express.Router();
-var {getBar} = require('./../db_crud')
+var {getBar, updateBar} = require('./../db_crud')
 
 /* GET home page. */
-function get(req, res, next) {
-  res.json(getBar(req.params['idBar']))
+async function get(req, res, next) {
+  try{
+    res.json(await getBar(req.params['idBar']))
+  }catch(ex){
+    res.status(500).send({message:'internal error'})
+  }
+};
+
+async function update(req, res, next) {
+  try{
+    res.json(await updateBar(req.params['idBar', 'nome']))
+  }catch(ex){
+    res.status(500).send({message:'internal error'})
+  }
 };
 
 module.exports = {
-    get
+    get, update
 }

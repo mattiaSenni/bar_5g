@@ -2,8 +2,8 @@
 var {getPrenotazione, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione} = require('../db_crud')
 
 function get(req, res, next) {
-  getPrenotazion1(req.params['idUser']).then((data)=>{
-    res.json(data[0])
+  getPrenotazioni(req.params['idUser']).then((data)=>{
+    res.json(data[0]);
   })
 };
 

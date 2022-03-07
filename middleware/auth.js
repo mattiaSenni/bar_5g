@@ -1,12 +1,12 @@
-var jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 /*
 grad server per inserire l'autenticazione, se un utente ha privilegi di un 
 certo grado allora la richiesta avanzerà, se no verrà rifiutata e ritornerà 
 un errore
 */
 
-function getUserJwt(jwt){
-    return jwt.verify(jwt, process.env['jwttoken'])
+function getUserJwt(stringa){
+    return jwt.verify(stringa, 'cane')
 }
 
 function grad1(req, res, next){
@@ -15,6 +15,9 @@ function grad1(req, res, next){
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user
+        if(!(user['Ruolo'] >= 1)){
+            throw new Error();
+        }
         next()
     }catch(ex){
         res.status(401).json({message:'invalid token'})
@@ -26,6 +29,9 @@ function grad2(req, res, next){
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user
+        if(!(user['Ruolo'] >= 2)){
+            throw new Error();
+        }
         next()
     }catch(ex){
         res.status(401).json({message:'invalid token'})
@@ -37,6 +43,9 @@ function grad3(req, res, next){
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user
+        if(!(user['Ruolo'] >= 3)){
+            throw new Error();
+        }
         next()
     }catch(ex){
         res.status(401).json({message:'invalid token'})
@@ -48,6 +57,9 @@ function grad4(req, res, next){
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user
+        if(!(user['Ruolo'] >= 4)){
+            throw new Error();
+        }
         next()
     }catch(ex){
         res.status(401).json({message:'invalid token'})
