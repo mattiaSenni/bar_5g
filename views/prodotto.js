@@ -1,11 +1,17 @@
 
-var {getMenu, getProdotto} = require('../db_crud')
+var {getMenu, getProdotto, getProdottiMenu} = require('../db_crud')
 
 async function get(req, res, next) {
   try{
-    getMenu(req.params['idBar']).then((data)=>{
-      res.json(data[0])
-    })
+    let data = await getMenu(req.params['idBar'])
+    let ret = []
+    for(let d of data[0]){
+      ret.push({
+        ...d,
+        prodotti : (await getProdottiMenu(d['ID']))[0]
+      })
+    }
+    res.json(ret)
   }catch(ex){
     res.status(500).json({message:'internal error'})
   }

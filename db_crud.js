@@ -119,7 +119,7 @@ async function getPrenotazioni(idUser){
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
         .input('ID', sql.Int, idUser)
-        .query("SELECT Modalita_pagamento, Prenotazioni.Data, Stato ,Utenti.Nome, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine from Prenotazioni INNER JOIN Utenti ON Utenti.ID = Prenotazioni.IDUtente INNER JOIN Transazioni ON Transazioni.ID = IDTransazione INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOraria.ID INNER JOIN Scuola ON IDScuola = Scuola.ID INNER JOIN Provenienza ON IDProvenienza = Provenienza.ID WHERE Prenotazioni.IDUtente = @ID");
+        .query("SELECT Prenotazioni.ID, Modalita_pagamento, Prenotazioni.Data, Stato ,Utenti.Nome, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine from Prenotazioni INNER JOIN Utenti ON Utenti.ID = Prenotazioni.IDUtente LEFT JOIN Transazioni ON Transazioni.ID = IDTransazione INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOraria.ID INNER JOIN Scuola ON IDScuola = Scuola.ID LEFT JOIN Provenienza ON IDProvenienza = Provenienza.ID WHERE Prenotazioni.IDUtente = @ID");
         return  product.recordsets;
     }
         catch (error) {
@@ -127,9 +127,46 @@ async function getPrenotazioni(idUser){
     }
 }
 
-async function postPrenotazione(idUser, Pagamento, Data, ){
-    return {
-        ok:true
+async function postPrenotazione(idUser, data, stato, idFasciaOraria, modalitaPagamento){
+    try {
+        let  pool = await  sql.connect(config);
+        await pool.request()
+        .input('IDUser', sql.Int, idUser)
+        .input('data', sql.VarChar, data)
+        .input('stato', sql.Int, stato)
+        .input('modalitaPagamento', sql.Int, modalitaPagamento)
+        .input('idFasciaOraria', sql.Int, idFasciaOraria)
+        .query("INSERT INTO Prenotazioni (IDUtente, Modalita_pagamento, Data, Stato, IDFasciaOraria) VALUES (@IDUser, @modalitaPagamento, @data, @stato, @idFasciaOraria)");
+        // return  product.recordsets;
+        let  pool2 = await  sql.connect(config);
+        let  product2 = await  pool2.request()
+        .input('IDUser', sql.Int, idUser)
+        .input('data', sql.VarChar, data)
+        .input('stato', sql.Int, stato)
+        .input('modalitaPagamento', sql.Int, modalitaPagamento)
+        .input('idFasciaOraria', sql.Int, idFasciaOraria)
+        .query("SELECT ID FROM Prenotazioni WHERE Data=@data AND IDUtente=@IDUser");
+        let pren = await  product2.recordsets;
+        return pren;
+        
+    }
+        catch (error) {
+        console.log(error);
+    }
+}
+
+async function insertProductInPrenotazione(idPrenotazione, idProdotto, qt){
+    try {
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('IDPrenotazione', sql.Int, idPrenotazione)
+        .input('IDMenu', sql.Int, idProdotto)
+        .input('qt', sql.Int, qt)
+        .query("INSERT INTO PrenotazioneMenu (IDPrenotazione, IDMenu, Quantita) VALUES (@IDPrenotazione, @IDMenu, @qt)");
+        return  product.recordsets;
+    }
+        catch (error) {
+        console.log(error);
     }
 }
 
@@ -166,7 +203,7 @@ async function getPrenotazione(idPrenotazione){
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
         .input('IDPrenotazione', sql.Int, idPrenotazione)
-        .query("SELECT Modalita_pagamento, Prenotazioni.Data, Stato ,Utenti.Nome, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine FROM Prenotazioni INNER JOIN Utenti ON Utenti.ID = Prenotazioni.IDUtente INNER JOIN Transazioni ON Transazioni.ID = IDTransazione INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOraria.ID INNER JOIN Scuola ON IDScuola = Scuola.ID INNER JOIN Provenienza ON IDProvenienza = Provenienza.ID WHERE @IDPrenotazione = Prenotazioni.ID");        
+        .query("SELECT Prenotazioni.ID, Modalita_pagamento, Menu.ID AS IDMenu, Menu.Nome, Prenotazioni.Data, Stato ,Utenti.Nome AS NomeUtente, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine  FROM Prenotazioni  INNER JOIN Utenti ON Utenti.ID = Prenotazioni.IDUtente  LEFT JOIN Transazioni ON Transazioni.ID = IDTransazione  INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOraria.ID  INNER JOIN Scuola ON IDScuola = Scuola.ID  LEFT JOIN Provenienza ON IDProvenienza = Provenienza.ID LEFT JOIN PrenotazioneMenu ON PrenotazioneMenu.IDPrenotazione = Prenotazioni.ID LEFT JOIN Menu ON PrenotazioneMenu.IDMenu = Menu.ID WHERE 2 = Prenotazioni.ID");
         return  product.recordsets; 
     }
         catch (error) {
@@ -215,6 +252,34 @@ async function deleteBar(idBar){
     }
 }
 
+async function getProdotto(idPrenotazione){
+    try {
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('ID', sql.Int, idPrenotazione)
+        .query("SELECT Prodotto.Nome, Prodotto.Descrizione, Categoria.Categoria, Menu.Nome AS NomeMenu, Allergeni.Nome AS NomeAllergeni FROM Prenotazioni INNER JOIN PrenotazioneMenu ON IDPrenotazione = Prenotazioni.ID INNER JOIN Menu ON PrenotazioneMenu.IDMenu = Menu.ID INNER JOIN MenuProdotto ON MenuProdotto.IDMenu = Menu.ID INNER JOIN Prodotto ON MenuProdotto.IDProdotto = Prodotto.ID INNER JOIN Categoria ON Prodotto.IDCategoria = Categoria.ID INNER JOIN ProdottoAllergeni ON ProdottoAllergeni.IDProdotto = Prodotto.ID INNER JOIN Allergeni ON ProdottoAllergeni.IDAllergeni = Allergeni.ID WHERE Prenotazioni.ID = @ID");
+        return  product.recordsets;
+    }
+        catch (error) {
+        console.log(error);
+    }
+}
+
+async function getProdottiMenu(idMenu){
+    try {
+        let  pool = await  sql.connect(config);
+        let  product = await  pool.request()
+        .input('ID', sql.Int, idMenu)
+        .query("SELECT Prodotto.Nome, Prodotto.Descrizione, Categoria.Categoria, Allergeni.Nome AS NomeAllergeni FROM Menu  INNER JOIN MenuProdotto ON Menu.ID = MenuProdotto.IDMenu  INNER JOIN Prodotto ON Prodotto.ID = MenuProdotto.IDProdotto  INNER JOIN Categoria ON Categoria.ID = Prodotto.IDCategoria  LEFT JOIN ProdottoAllergeni ON ProdottoAllergeni.IDProdotto = Prodotto.ID  LEFT JOIN Allergeni ON ProdottoAllergeni.IDAllergeni = Allergeni.ID  WHERE Menu.ID = @ID");
+        return  product.recordsets;
+    }
+        catch (error) {
+        console.log(error);
+    }
+}
+
+
+
 module.exports = {
-    getBar,getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar, postProdotto, deleteBar
+    getBar,getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar, postProdotto, deleteBar, insertProductInPrenotazione, getProdotto, getProdottiMenu
 }

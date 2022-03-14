@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var {getBar, updateBar} = require('./../db_crud')
+var {getBar, updateBar, getMenu} = require('./../db_crud')
 
 /* GET home page. */
 async function get(req, res, next) {
@@ -19,6 +19,15 @@ async function update(req, res, next) {
   }
 };
 
+async function getMenu(req, res, next){
+  try{
+    let data = await getMenu(req.params['idBar']);
+    res.json(data);
+  }catch(ex){
+    res.status(500).json({message:'internal error'})
+  }
+}
+
 module.exports = {
-    get, update
+    get, update, getMenu
 }
