@@ -6,12 +6,12 @@ un errore
 */
 
 function getUserJwt(stringa){
-    return jwt.verify(stringa, 'cane')
+    return jwt.verify(stringa, process.env['jwttoken'])
 }
 
 function grad1(req, res, next){
     try{
-        let token = req.body['token']
+        let token = req.body['token'] || req.query['token']
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user
@@ -25,7 +25,7 @@ function grad1(req, res, next){
 }
 function grad2(req, res, next){
     try{
-        let token = req.body['token']
+        let token = req.body['token'] || req.query['token']
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user
@@ -39,7 +39,7 @@ function grad2(req, res, next){
 }
 function grad3(req, res, next){
     try{
-        let token = req.body['token']
+        let token = req.body['token'] || req.query['token']
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user
@@ -53,7 +53,7 @@ function grad3(req, res, next){
 }
 function grad4(req, res, next){
     try{
-        let token = req.body['token']
+        let token = req.body['token'] || req.query['token']
         if(!token) throw new Error()
         let user = getUserJwt(token)
         res.locals.user = user

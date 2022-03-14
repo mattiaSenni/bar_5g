@@ -9,7 +9,6 @@ async function login(req, res, next){
       let notStudent = false;
       if(user[0].length <= 0){
         notStudent = true
-        console.log(user);
         user = await database.loginDipendenti(req.body['username'], req.body['password'])
       }
       if(user){

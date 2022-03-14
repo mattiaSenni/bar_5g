@@ -257,7 +257,7 @@ async function getProdotto(idPrenotazione){
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
         .input('ID', sql.Int, idPrenotazione)
-        .query("SELECT Prodotto.Nome, Prodotto.Descrizione, Categoria.Categoria, Menu.Nome AS NomeMenu, Allergeni.Nome AS NomeAllergeni FROM Prenotazioni INNER JOIN PrenotazioneMenu ON IDPrenotazione = Prenotazioni.ID INNER JOIN Menu ON PrenotazioneMenu.IDMenu = Menu.ID INNER JOIN MenuProdotto ON MenuProdotto.IDMenu = Menu.ID INNER JOIN Prodotto ON MenuProdotto.IDProdotto = Prodotto.ID INNER JOIN Categoria ON Prodotto.IDCategoria = Categoria.ID INNER JOIN ProdottoAllergeni ON ProdottoAllergeni.IDProdotto = Prodotto.ID INNER JOIN Allergeni ON ProdottoAllergeni.IDAllergeni = Allergeni.ID WHERE Prenotazioni.ID = @ID");
+        .query("SELECT Prodotto.Nome, Prodotto.Descrizione, Categoria.Categoria, Menu.Nome AS NomeMenu, Allergeni.Nome AS NomeAllergeni FROM Prenotazioni INNER JOIN PrenotazioneMenu ON IDPrenotazione = Prenotazioni.ID INNER JOIN Menu ON PrenotazioneMenu.IDMenu = Menu.ID INNER JOIN MenuProdotto ON MenuProdotto.IDMenu = Menu.ID INNER JOIN Prodotto ON MenuProdotto.IDProdotto = Prodotto.ID INNER JOIN Categoria ON Prodotto.IDCategoria = Categoria.ID LEFT JOIN ProdottoAllergeni ON ProdottoAllergeni.IDProdotto = Prodotto.ID LEFT JOIN Allergeni ON ProdottoAllergeni.IDAllergeni = Allergeni.ID WHERE Prenotazioni.ID = @ID");
         return  product.recordsets;
     }
         catch (error) {
