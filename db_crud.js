@@ -7,7 +7,7 @@ async function loginUtenti(username, password){
         let  product = await  pool.request()
         .input('email', sql.NVarChar, username)
         .input('password', sql.NVarChar, password)
-        .query("SELECT Utenti.ID, Utenti.Nome, Cognome, Classe, Data_Nascita, Scuola.Nome AS NomeScuola, Email, Indirizzo, Citta FROM Utenti INNER JOIN Scuola ON IDScuola = Scuola.ID WHERE Utenti.Email = @email AND Password = @password");
+        .query("SELECT Utenti.ID, Utenti.Nome, Cognome, Classe, Data_Nascita, Scuola.Nome AS NomeScuola, Email, Indirizzo, Citta, Bar.Nome AS Bar, Bar.ID AS IDBar FROM Utenti INNER JOIN Scuola ON IDScuola = Scuola.ID INNER JOIN Bar ON Bar.IDScuola = Scuola.ID WHERE Utenti.Email = @email AND Password = @password");
         return  product.recordsets;
     }
         catch (error) {
@@ -112,6 +112,41 @@ async function updateUser(userId, name, surname)
     //     catch (error) {
     //     console.log(error);
     // }
+}
+
+async function pushPrenotazione(json) {
+    //Senni Mattia
+    try {
+        // Transazioni
+        // Prenotazioni
+        // PrenotazioneMenu
+        let pool = await sql.connect(config);
+        let res = await pool.request()
+            .input('IDProvenienza', sql.Int, json.transazione.idProvenienza)
+            .input('saldo', sql.Float, json.transazione.saldo)
+            .query('INSERT INTO Transazioni(Saldo, IDProvenienza) VALUES (@saldo, @IDProvenienza)');
+        res = await pool.request()
+            .query('select MAX(ID) from Transazioni');
+
+        // console.log(idTransazione);
+        res = await pool.request()
+            .input('IDUtente', sql.Int, json.idUtente)
+            .input('modalitaPagamento', sql.Int, json.modalitaPagamento)
+            .input('data', sql.VarChar, Date.now())
+            .input('stato', sql.Int, 3)
+            .input('idFasciaOraria', sql.Int, json.idFasciaOraria)
+            .query('INSERT INTO PRENOTAZIONI(IDUtente, Modalita_pagamento, Data, Stato, IDTransazione, IDFasciaOraria) VALUES (@IDUtente, @modalitaPagamento, @data, @stato, (select MAX(ID) from Transazioni), @idFasciaOraria)');
+
+        for (let i of json.menu) {
+            res = await pool.request()
+                .input('IDMenu', sql.Int, i.idMenu)
+                .input('Quantita', sql.Int, i.quantita)
+                .query('INSERT INTO PrenotazioneMenu(IDPrenotazione, IDMenu, Quantita) VALUES ((select MAX(ID) from Prenotazioni), @IDMenu, @Quantita)');
+        }
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
 }
 
 async function getPrenotazioni(idUser){
@@ -281,5 +316,5 @@ async function getProdottiMenu(idMenu){
 
 
 module.exports = {
-    getBar,getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar, postProdotto, deleteBar, insertProductInPrenotazione, getProdotto, getProdottiMenu
+    getBar,getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar, postProdotto, deleteBar, insertProductInPrenotazione, getProdotto, getProdottiMenu, pushPrenotazione
 }

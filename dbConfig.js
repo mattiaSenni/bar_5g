@@ -1,7 +1,7 @@
 const  config = {
     user:  'sa',
-    password:  'burbero2020',
-    server:  '10.1.0.19', // 'PC0152'
+    password:  'Burbero2020',
+    server:  '192.168.1.229', // 'PC0118' // '10.1.0.18' // '192.168.43.48'
     database:  'Bar_5G',
     options: {
       trustedconnection:  true,

@@ -1,5 +1,5 @@
 
-var {getProdottiMenu, getPrenotazione, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, insertProductInPrenotazione} = require('../db_crud')
+var {getProdottiMenu, getPrenotazione, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, insertProductInPrenotazione, pushPrenotazione} = require('../db_crud')
 
 function get(req, res, next) {
   try{
@@ -73,6 +73,18 @@ function update(req, res, next){
     }
 }
 
+async function create(req, res, next) {
+    try {
+        let json = JSON.parse(req.body['prenotazione'])
+        /*
+            json = {"transazione":{"idProvenienza": 4,"saldo": 2},"idUtente": 1,"modalitaPagamento":1,"idFasciaOraria":1, "menu": [{"idMenu":2,"quantita": 3}]}
+        */
+        res.json(await pushPrenotazione(json));
+    } catch (ex) {
+        res.status(500).json({ message: 'internal error' })
+    }
+}
+
 module.exports = {
-    get, getSingle, post, del, update
+    get, getSingle, post, del, update, create
 }

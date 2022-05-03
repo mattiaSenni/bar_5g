@@ -22,7 +22,8 @@ async function login(req, res, next){
     }else{
       throw new Error();
     }
-  }catch(ex){
+  } catch (ex) {
+    console.log(ex);
     res.status(401).json({message:'authentication failed'});
   }
 }
@@ -32,7 +33,7 @@ function get(req, res, next){
     database.getUser(req.params['idUser']).then((data)=>{
       res.json(data);
     })
-  }catch(ex){
+  } catch (ex) {
     res.status(500).json({message:'internal error'});
   }
 }

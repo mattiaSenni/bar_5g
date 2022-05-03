@@ -12,5 +12,7 @@ router.get('/:idUser', grad2, userCheck, user.get)
 router.delete('/:idUser', grad2, userCheck, user.del)
 router.delete('/:idUser/prenotazione/:idPrenotazione', grad2, userCheck, prenotazioni.del)
 router.get('/:idUser/prenotazione/:idPrenotazione', grad2, userCheck, prenotazioni.getSingle)
+router.put('/:idUser/prenotazione', grad2, userCheck, prenotazioni.create)
+
 
 module.exports = router;
