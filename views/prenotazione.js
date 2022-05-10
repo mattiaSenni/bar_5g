@@ -20,7 +20,8 @@ async function getSingle(req, res, next) {
             IDMenu: undefined,
             Nome: undefined
         }
-        obj['menu'] = fd1.map(o => {return {IDMenu : o['IDMenu'], Nome : o['Nome']}})
+        console.log(obj);
+        obj['menu'] = fd1.map(o => {return {IDMenu : o['IDMenu'], Nome : o['Nome'], Immagine: o['Immagine'], Quantita: o['Quantita']}})
         let ret = []
         for(let d of obj['menu']){
             ret.push({

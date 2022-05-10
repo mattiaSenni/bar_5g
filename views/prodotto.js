@@ -1,5 +1,5 @@
 
-var {getMenu, getProdotto, getProdottiMenu} = require('../db_crud')
+var { getMenu, getProdotto, getProdottiMenu, getImmagineMenu} = require('../db_crud')
 
 async function get(req, res, next) {
   try{
@@ -8,7 +8,8 @@ async function get(req, res, next) {
     for(let d of data[0]){
       ret.push({
         ...d,
-        prodotti : (await getProdottiMenu(d['ID']))[0]
+        prodotti: (await getProdottiMenu(d['ID']))[0],
+        Immagine: (await getImmagineMenu(d['ID']))[0][0].Immagine
       })
     }
     res.json(ret)
