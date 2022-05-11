@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var {getBar, updateBar, getMenu} = require('./../db_crud')
+var { getBar, updateBar, getMenu, getFascieOrarie} = require('./../db_crud')
 
 /* GET home page. */
 async function get(req, res, next) {
@@ -10,6 +10,14 @@ async function get(req, res, next) {
     res.status(500).send({message:'internal error'})
   }
 };
+
+async function getFasciaOraria(req, res, next) {
+  try {
+    res.json(await getFascieOrarie(req.params['idBar']))
+  } catch (ex) {
+    res.status(500).send({ message: 'internal error' })
+  }
+}
 
 async function update(req, res, next) {
   try{
@@ -29,5 +37,5 @@ async function getMenu(req, res, next){
 }
 
 module.exports = {
-    get, update, getMenu
+    get, update, getMenu, getFasciaOraria
 }

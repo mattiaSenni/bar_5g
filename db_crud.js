@@ -42,6 +42,21 @@ async function getBar(IDBar){
     }
 }
 
+async function getFascieOrarie(IDBar) {
+    try {
+        let pool = await sql.connect(config);
+        let product = await pool.request()
+            .input('IDBar', sql.Int, IDBar)
+            .query("SELECT FasciaOraria.* FROM Bar INNER JOIN BarFasciaOraria ON BarFasciaOraria.IDBar = Bar.ID INNER JOIN FasciaOraria ON FasciaOraria.ID = IDFasciaOraria WHERE Bar.ID = @IDBar");
+        return product.recordset;
+
+    } catch (error) {
+        console.log(error);
+
+    }
+            
+}
+
 async function getMenu(IDBar){
     try {
         let  pool = await  sql.connect(config);
@@ -56,7 +71,6 @@ async function getMenu(IDBar){
 }
 
 async function getProdotto(IDBar, IDProdotto){
-    //TODO: Aggiungere info su scuola
     try {
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
@@ -238,7 +252,7 @@ async function getPrenotazione(idPrenotazione){
         let  pool = await  sql.connect(config);
         let  product = await  pool.request()
         .input('IDPrenotazione', sql.Int, idPrenotazione)
-            .query("SELECT Prenotazioni.ID, Modalita_pagamento, Menu.ID AS IDMenu, Menu.Nome, Menu.Immagine, Prenotazioni.Data, Stato ,Utenti.Nome AS NomeUtente, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine, Quantita  FROM Prenotazioni  INNER JOIN Utenti ON Utenti.ID = Prenotazioni.IDUtente  LEFT JOIN Transazioni ON Transazioni.ID = IDTransazione  INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOraria.ID  INNER JOIN Scuola ON IDScuola = Scuola.ID  LEFT JOIN Provenienza ON IDProvenienza = Provenienza.ID LEFT JOIN PrenotazioneMenu ON PrenotazioneMenu.IDPrenotazione = Prenotazioni.ID LEFT JOIN Menu ON PrenotazioneMenu.IDMenu = Menu.ID WHERE 2 = Prenotazioni.ID");
+            .query("SELECT Prenotazioni.ID, PrenotazioneMenu.Quantita, Modalita_pagamento, Menu.ID AS IDMenu, Menu.Nome, Menu.Immagine, Prenotazioni.Data, Stato ,Utenti.Nome AS NomeUtente, Utenti.Cognome, Utenti.Classe, Utenti.Data_Nascita, Utenti.Email, Scuola.Nome AS NomeScuola, Scuola.Indirizzo, Scuola.Citta, Saldo, Tipologia, Ora_Inizio, Ora_Fine FROM Prenotazioni  INNER JOIN Utenti ON Utenti.ID = Prenotazioni.IDUtente  LEFT JOIN Transazioni ON Transazioni.ID = IDTransazione  INNER JOIN FasciaOraria ON IDFasciaOraria = FasciaOraria.ID  INNER JOIN Scuola ON IDScuola = Scuola.ID  LEFT JOIN Provenienza ON IDProvenienza = Provenienza.ID LEFT JOIN PrenotazioneMenu ON PrenotazioneMenu.IDPrenotazione = Prenotazioni.ID LEFT JOIN Menu ON PrenotazioneMenu.IDMenu = Menu.ID WHERE @IDPrenotazione = Prenotazioni.ID");
         return  product.recordsets; 
     }
         catch (error) {
@@ -329,5 +343,5 @@ async function getImmagineMenu(idMenu) {
 
 
 module.exports = {
-    getBar, getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar, postProdotto, deleteBar, insertProductInPrenotazione, getProdotto, getProdottiMenu, pushPrenotazione, getImmagineMenu
+    getBar, getMenu, getProdotto, getUser, deleteUser, updateUser, getPrenotazioni, postPrenotazione, deletePrenotazione, updatePrenotazione, getPrenotazione, loginUtenti, loginDipendenti, updateBar, postProdotto, deleteBar, insertProductInPrenotazione, getProdotto, getProdottiMenu, pushPrenotazione, getImmagineMenu, getFascieOrarie
 }

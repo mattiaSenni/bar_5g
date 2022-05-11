@@ -76,12 +76,30 @@ function update(req, res, next){
 
 async function create(req, res, next) {
     try {
+        
         let json = JSON.parse(req.body['prenotazione'])
         /*
-            json = {"transazione":{"idProvenienza": 4,"saldo": 2},"idUtente": 1,"modalitaPagamento":1,"idFasciaOraria":1, "menu": [{"idMenu":2,"quantita": 3}]}
+            json = 
+            {
+                "transazione":{
+                    "idProvenienza": 4,
+                    "saldo": 2
+                },
+                "idUtente": 1,
+                "modalitaPagamento":1,
+                "idFasciaOraria":1, 
+                "menu": 
+                [
+                    {
+                        "idMenu":2,
+                        "quantita": 3
+                    }
+                ]
+            }
         */
         res.json(await pushPrenotazione(json));
     } catch (ex) {
+        console.log(ex);
         res.status(500).json({ message: 'internal error' })
     }
 }

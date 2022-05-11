@@ -6,6 +6,7 @@ var {grad1, grad2, grad3, grad4} = require('./../middleware/auth')
 
 router.get('/:idBar/menu/:idProdotto', grad1, menu.getSingle)
 router.get('/:idBar/menu', grad1, menu.get)
+router.get('/:idBar/fasciaoraria', grad1, bar.getFasciaOraria)
 router.get('/:idBar', grad2, bar.get)
 router.put('/:idBar', grad3, bar.update)
 module.exports = router;
